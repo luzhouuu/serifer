@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/kyicy/Seifer/config"
+	"github.com/kyicy/seifer/config"
 )
 
 func main() {
