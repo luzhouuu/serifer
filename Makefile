@@ -1,4 +1,4 @@
-.PHONY	:	preset-air preset-migrate
+default: migrate-up run
 
 run:
 	.bin/air
