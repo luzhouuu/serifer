@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/kyicy/seifer/config"
+	"bitbucket.org/kyicy/seifer/config"
 )
 
 func main() {
@@ -31,5 +31,5 @@ func main() {
 
 // Handler
 func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, my World!")
+	return c.String(http.StatusOK, "Hello, my World !!!")
 }

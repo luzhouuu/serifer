@@ -1,4 +1,4 @@
-module github.com/kyicy/seifer
+module bitbucket.org/kyicy/seifer
 
 go 1.12
 
