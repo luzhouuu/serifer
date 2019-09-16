@@ -4,6 +4,8 @@ Golang User Story Recommendation/Query Engine
 
 Related repos:
 > https://github.com/bao1018/gpt-2-master
+>
+> https://github.com/luzhouuu/UserstoreisTag
 
 ## Overall Tech Arch Diagram
 
