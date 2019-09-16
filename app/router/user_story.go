@@ -44,7 +44,7 @@ func CreateUserStory(c echo.Context) error {
 
 		model.DB.Find(&tagTexts)
 
-		userStory.TagId = tagText.ID
+		userStory.TagID = tagText.ID
 	}
 
 	titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
@@ -62,6 +62,7 @@ func CreateUserStory(c echo.Context) error {
 type similarUserStoriesBody struct {
 	Title string `json:"title" form:"title"`
 	Body  string `json:"body" form:"body"`
+	TagID int    `json:"tagId" form:"tagId"`
 }
 
 // SimilarUserStories handler
@@ -78,7 +79,11 @@ func SimilarUserStories(c echo.Context) error {
 
 	var userStories []model.UserStory
 
-	model.DB.Find(&userStories)
+	if body.TagID > 0 {
+		model.DB.Where("tag_id = ? or tag_id is NULL", body.TagID).Find(&userStories)
+	} else {
+		model.DB.Find(&userStories)
+	}
 
 	var ids []uint
 	var titleVecs, bodyVecs []float64
@@ -106,8 +111,6 @@ func SimilarUserStories(c echo.Context) error {
 
 	Score := mat.Row(nil, 0, &ScoreMat)
 
-	fmt.Println(Score)
-
 	slice := NewSlice(Score...)
 
 	sort.Sort(sort.Reverse(slice))
@@ -117,11 +120,11 @@ outloop:
 	for i, index := range slice.idx {
 		userStories[index].Score = Score[i]
 		userStoryResult = append(userStoryResult, &userStories[index])
-	    if i >=4{
-	        break outloop
-	    }
+		fmt.Print(userStoryResult)
+		if i >= 4 {
+			break outloop
+		}
 	}
-
 	return c.JSON(http.StatusOK, userStoryResult)
 }
 

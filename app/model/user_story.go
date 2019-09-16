@@ -12,8 +12,8 @@ type UserStory struct {
 	Body        string          `json:"body"`
 	TitleVector pq.Float64Array `gorm:"type:double precision[]" json:"-"`
 	BodyVector  pq.Float64Array `gorm:"type:double precision[]" json:"-"`
-	TagId       uint            `json:"tagId"`
-	Score       float64         `json:Score`
+	TagID       uint            `json:"tagId"`
+	Score       float64         `json:"Score"`
 }
 
 //TagText Model

@@ -24,6 +24,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.LogMode(true)
 	defer db.Close()
 	model.Init(db)
 	model.InitTag(db)
