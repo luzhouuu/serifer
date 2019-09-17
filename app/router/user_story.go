@@ -104,7 +104,7 @@ func SimilarUserStories(c echo.Context) error {
 
 	var bodyRank mat.Dense
 	bodyRank.Mul(bodyDense, bodyMatrixT)
-	bodyRank.Scale(0.4, &titleRank)
+	bodyRank.Scale(0.4, &bodyRank)
 
 	var ScoreMat mat.Dense
 	ScoreMat.Add(&titleRank, &bodyRank)
