@@ -80,7 +80,7 @@ func SimilarUserStories(c echo.Context) error {
 	var userStories []model.UserStory
 
 	if body.TagID > 0 {
-		model.DB.Where("tag_id = ? or tag_id is NULL", body.TagID).Find(&userStories)
+		model.DB.Where("tag_id = ? or tag_id = 0", body.TagID).Find(&userStories)
 	} else {
 		model.DB.Find(&userStories)
 	}
