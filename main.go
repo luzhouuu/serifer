@@ -27,7 +27,6 @@ func main() {
 	db.LogMode(true)
 	defer db.Close()
 	model.Init(db)
-	model.InitTag(db)
 
 	// Echo instance
 	e := echo.New()

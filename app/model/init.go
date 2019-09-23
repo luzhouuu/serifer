@@ -10,8 +10,3 @@ func Init(db *gorm.DB) {
 	DB = db
 	DB.AutoMigrate(&UserStory{})
 }
-
-func InitTag(db *gorm.DB) {
-	DB = db
-	DB.AutoMigrate(&TagText{})
-}
