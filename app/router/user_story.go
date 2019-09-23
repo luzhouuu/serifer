@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"sync"
@@ -175,4 +176,86 @@ func NewSlice(n ...float64) *Slice {
 		s.idx[i] = i
 	}
 	return s
+}
+
+type createUserStoryBodyExpand struct {
+	Body string `json:"body" form:"body"`
+}
+
+// CreateUserStoryExpand handler
+func CreateUserStoryExpand(c echo.Context) error {
+	body := new(createUserStoryBodyExpand)
+	if err := c.Bind(body); err != nil {
+		return c.NoContent(http.StatusUnprocessableEntity)
+	}
+
+	userStory := new(model.UserStory)
+	// userStory.Title = body.Title
+	userStory.Body = body.Body
+
+	// titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
+	bodyVector := titleAndBodyToVectors(body.Body)
+
+	// userStory.Title = body.Title
+	userStory.Body = body.Body
+	// userStory.TitleVector = titleVector
+	userStory.BodyVector = bodyVector
+	userStory.Capability = body.Capability
+	userStory.SubCapability = body.SubCapability
+	userStory.Epic = body.Epic
+
+	model.DB.Save(userStory)
+
+	return c.NoContent(http.StatusOK)
+}
+
+type similarUserStoriesBodyExpand struct {
+	// Title string `json:"title" form:"title"`
+	Body  string `json:"body" form:"body"`
+	TagID int    `json:"tagId" form:"tagId"`
+}
+
+// SimilarUserStoriesExpand handler
+func SimilarUserStoriesExpand(c echo.Context) error {
+	body := new(similarUserStoriesBodyExpand)
+	if err := c.Bind(body); err != nil {
+		return c.NoContent(http.StatusUnprocessableEntity)
+	}
+
+	bodyVector := titleAndBodyToVectors(body.Body)
+
+	bodyDense := mat.NewDense(1, DIM, bodyVector)
+
+	var userStories []model.UserStory
+
+	model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
+
+	var bodyVecs []float64
+	for _, userStory := range userStories {
+		bodyVecs = append(bodyVecs, userStory.BodyVector...)
+	}
+
+	bodyMatrix := mat.NewDense(len(userStories), DIM, bodyVecs)
+	bodyMatrixT := bodyMatrix.T()
+
+	var bodyRank mat.Dense
+	bodyRank.Mul(bodyDense, bodyMatrixT)
+
+	Score := mat.Row(nil, 0, &bodyRank)
+
+	slice := NewSlice(Score...)
+
+	sort.Sort(sort.Reverse(slice))
+
+	var userStoryResult []*model.UserStory
+outloop:
+	for i, index := range slice.idx {
+		userStories[index].Score = Score[i]
+		userStoryResult = append(userStoryResult, &userStories[index])
+		fmt.Print(userStoryResult)
+		if i >= 4 {
+			break outloop
+		}
+	}
+	return c.JSON(http.StatusOK, userStoryResult)
 }

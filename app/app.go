@@ -13,6 +13,6 @@ func RegisterRoute(e *echo.Echo) {
 
 //ExpandRoute is func
 func ExpandRoute(e *echo.Echo) {
-	e.POST("/expand", router.CreateUserStory)
-	e.POST("/expand/similar", router.SimilarUserStories)
+	e.POST("/expand", router.CreateUserStoryExpand)
+	e.POST("/expand/similar", router.SimilarUserStoriesExpand)
 }
