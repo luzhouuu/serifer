@@ -10,6 +10,7 @@ import (
 type Configuration struct {
 	Addr     string `json:"addr"`
 	Port     string `json:"port"`
+	Expand   string `json:"expand"`
 	Database struct {
 		Driver     string `json:"driver"`
 		Connection string `json:"connection"`
