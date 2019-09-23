@@ -15,7 +15,7 @@ import (
 const DIM = 512
 
 type createUserStoryBody struct {
-	Title         string `json:"title" form:"title"`
+	// Title         string `json:"title" form:"title"`
 	Body          string `json:"body" form:"body"`
 	Capability    string `json:"capability" from:"capability"`
 	SubCapability string `json:"subcapability" from:"subcapability"`
@@ -32,20 +32,6 @@ func CreateUserStory(c echo.Context) error {
 	userStory := new(model.UserStory)
 	userStory.Title = body.Title
 	userStory.Body = body.Body
-
-	if body.Capability != " " || body.SubCapability != " " || body.Epic != " " {
-		tagText := new(model.TagText)
-		tagText.Capability = body.Capability
-		tagText.SubCapability = body.SubCapability
-		tagText.Epic = body.Epic
-
-		model.DB.Save(tagText)
-		var tagTexts []model.TagText
-
-		model.DB.Find(&tagTexts)
-
-		userStory.TagID = tagText.ID
-	}
 
 	titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
 
