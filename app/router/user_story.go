@@ -19,6 +19,7 @@ type createUserStoryBody struct {
 	Capability    string `json:"capability" from:"capability"`
 	SubCapability string `json:"subcapability" from:"subcapability"`
 	Epic          string `json:"epic" from:"epic"`
+	Result        string `json:"result" from:"result"`
 }
 
 // CreateUserStory handler
@@ -39,6 +40,7 @@ func CreateUserStory(c echo.Context) error {
 	userStory.SubCapability = body.SubCapability
 	userStory.Epic = body.Epic
 	userStory.TagID = -1
+	userStory.Result = body.Result
 
 	model.DB.Save(userStory)
 
@@ -148,7 +150,8 @@ func NewSlice(n ...float64) *Slice {
 }
 
 type createUserStoryBodyExpand struct {
-	Body string `json:"body" form:"body"`
+	Body   string `json:"body" form:"body"`
+	Result string `json:"result" fron:"result"`
 }
 
 // CreateUserStoryExpand handler
@@ -165,6 +168,7 @@ func CreateUserStoryExpand(c echo.Context) error {
 
 	userStoryExpands.Body = body.Body
 	userStoryExpands.BodyVector = bodyVector
+	userStoryExpands.Result = body.Result
 
 	model.DB.Save(userStoryExpands)
 
