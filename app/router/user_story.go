@@ -38,7 +38,7 @@ func CreateUserStory(c echo.Context) error {
 	userStory.Capability = body.Capability
 	userStory.SubCapability = body.SubCapability
 	userStory.Epic = body.Epic
-	userStory.TagID = 1
+	userStory.TagID = -1
 
 	model.DB.Save(userStory)
 
