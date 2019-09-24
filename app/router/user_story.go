@@ -63,11 +63,6 @@ func SimilarUserStories(c echo.Context) error {
 
 	var userStories []model.UserStory
 
-	// if body.TagID > 0 {
-	// 	model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
-	// } else {
-	// 	model.DB.Find(&userStories)
-	// }
 	model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
 
 	// var ids []uint
@@ -84,7 +79,6 @@ func SimilarUserStories(c echo.Context) error {
 
 	var bodyRank mat.Dense
 	bodyRank.Mul(bodyDense, bodyMatrixT)
-	// bodyRank.Scale(0.4, &bodyRank)
 
 	Score := mat.Row(nil, 0, &bodyRank)
 
@@ -93,16 +87,8 @@ func SimilarUserStories(c echo.Context) error {
 	sort.Sort(sort.Reverse(slice))
 
 	var userStoryResult []*model.UserStory
-	// outloop:
-	// 	for i, index := range slice.idx {
-	// 		userStories[index].Score = Score[i]
-	// 		userStoryResult = append(userStoryResult, &userStories[index])
-	// 		fmt.Print(userStoryResult)
-	// 		if i >= 4 {
-	// 			break outloop
-	// 		}
-	// 	}
-	for _, index := range slice.idx {
+	for i, index := range slice.idx {
+		userStories[index].Score = Score[i]
 		userStoryResult = append(userStoryResult, &userStories[index])
 	}
 	return c.JSON(http.StatusOK, userStoryResult)
