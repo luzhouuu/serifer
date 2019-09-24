@@ -15,7 +15,6 @@ import (
 const DIM = 512
 
 type createUserStoryBody struct {
-	// Title         string `json:"title" form:"title"`
 	Body          string `json:"body" form:"body"`
 	Capability    string `json:"capability" from:"capability"`
 	SubCapability string `json:"subcapability" from:"subcapability"`
@@ -30,19 +29,16 @@ func CreateUserStory(c echo.Context) error {
 	}
 
 	userStory := new(model.UserStory)
-	// userStory.Title = body.Title
 	userStory.Body = body.Body
 
-	// titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
 	bodyVector := titleAndBodyToVectors(body.Body)
 
-	// userStory.Title = body.Title
 	userStory.Body = body.Body
-	// userStory.TitleVector = titleVector
 	userStory.BodyVector = bodyVector
 	userStory.Capability = body.Capability
 	userStory.SubCapability = body.SubCapability
 	userStory.Epic = body.Epic
+	userStory.TagID = 1
 
 	model.DB.Save(userStory)
 
@@ -50,7 +46,6 @@ func CreateUserStory(c echo.Context) error {
 }
 
 type similarUserStoriesBody struct {
-	// Title string `json:"title" form:"title"`
 	Body  string `json:"body" form:"body"`
 	TagID int    `json:"tagId" form:"tagId"`
 }
@@ -62,10 +57,8 @@ func SimilarUserStories(c echo.Context) error {
 		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	// titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
 	bodyVector := titleAndBodyToVectors(body.Body)
 
-	// titleDense := mat.NewDense(1, DIM, titleVector)
 	bodyDense := mat.NewDense(1, DIM, bodyVector)
 
 	var userStories []model.UserStory
@@ -86,23 +79,13 @@ func SimilarUserStories(c echo.Context) error {
 		bodyVecs = append(bodyVecs, userStory.BodyVector...)
 	}
 
-	// titleMatrix := mat.NewDense(len(userStories), DIM, titleVecs)
 	bodyMatrix := mat.NewDense(len(userStories), DIM, bodyVecs)
-	// titleMatrixT := titleMatrix.T()
 	bodyMatrixT := bodyMatrix.T()
-
-	// var titleRank mat.Dense
-	// titleRank.Mul(titleDense, titleMatrixT)
-	// titleRank.Scale(0.6, &titleRank)
 
 	var bodyRank mat.Dense
 	bodyRank.Mul(bodyDense, bodyMatrixT)
 	// bodyRank.Scale(0.4, &bodyRank)
 
-	// var ScoreMat mat.Dense
-	// ScoreMat.Add(&titleRank, &bodyRank)
-
-	// Score := mat.Row(nil, 0, &ScoreMat)
 	Score := mat.Row(nil, 0, &bodyRank)
 
 	slice := NewSlice(Score...)
@@ -189,30 +172,21 @@ func CreateUserStoryExpand(c echo.Context) error {
 		return c.NoContent(http.StatusUnprocessableEntity)
 	}
 
-	userStory := new(model.UserStory)
-	// userStory.Title = body.Title
-	userStory.Body = body.Body
+	userStoryExpands := new(model.UserStoryExpand)
+	userStoryExpands.Body = body.Body
 
-	// titleVector, bodyVector := titleAndBodyToVectors(body.Title, body.Body)
 	bodyVector := titleAndBodyToVectors(body.Body)
 
-	// userStory.Title = body.Title
-	userStory.Body = body.Body
-	// userStory.TitleVector = titleVector
-	userStory.BodyVector = bodyVector
-	userStory.Capability = body.Capability
-	userStory.SubCapability = body.SubCapability
-	userStory.Epic = body.Epic
+	userStoryExpands.Body = body.Body
+	userStoryExpands.BodyVector = bodyVector
 
-	model.DB.Save(userStory)
+	model.DB.Save(userStoryExpands)
 
 	return c.NoContent(http.StatusOK)
 }
 
 type similarUserStoriesBodyExpand struct {
-	// Title string `json:"title" form:"title"`
-	Body  string `json:"body" form:"body"`
-	TagID int    `json:"tagId" form:"tagId"`
+	Body string `json:"body" form:"body"`
 }
 
 // SimilarUserStoriesExpand handler
@@ -226,16 +200,16 @@ func SimilarUserStoriesExpand(c echo.Context) error {
 
 	bodyDense := mat.NewDense(1, DIM, bodyVector)
 
-	var userStories []model.UserStory
+	var userStoryExpands []model.UserStoryExpand
 
-	model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
+	model.DB.Find(&userStoryExpands)
 
 	var bodyVecs []float64
-	for _, userStory := range userStories {
+	for _, userStory := range userStoryExpands {
 		bodyVecs = append(bodyVecs, userStory.BodyVector...)
 	}
 
-	bodyMatrix := mat.NewDense(len(userStories), DIM, bodyVecs)
+	bodyMatrix := mat.NewDense(len(userStoryExpands), DIM, bodyVecs)
 	bodyMatrixT := bodyMatrix.T()
 
 	var bodyRank mat.Dense
@@ -247,11 +221,11 @@ func SimilarUserStoriesExpand(c echo.Context) error {
 
 	sort.Sort(sort.Reverse(slice))
 
-	var userStoryResult []*model.UserStory
+	var userStoryResult []*model.UserStoryExpand
 outloop:
 	for i, index := range slice.idx {
-		userStories[index].Score = Score[i]
-		userStoryResult = append(userStoryResult, &userStories[index])
+		userStoryExpands[index].Score = Score[i]
+		userStoryResult = append(userStoryResult, &userStoryExpands[index])
 		fmt.Print(userStoryResult)
 		if i >= 4 {
 			break outloop

@@ -18,3 +18,11 @@ type UserStory struct {
 	SubCapability string          `json:"subcapability"`
 	Epic          string          `json:"epic"`
 }
+
+//UserStoryExpand Model
+type UserStoryExpand struct {
+	gorm.Model
+	Body       string          `json:"body"`
+	BodyVector pq.Float64Array `gorm:"type:double precision[]" json:"-"`
+	Score      float64         `json:"Score"`
+}

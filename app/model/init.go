@@ -10,3 +10,9 @@ func Init(db *gorm.DB) {
 	DB = db
 	DB.AutoMigrate(&UserStory{})
 }
+
+//InitExpand Model
+func InitExpand(db *gorm.DB) {
+	DB = db
+	DB.AutoMigrate(&UserStoryExpand{})
+}
