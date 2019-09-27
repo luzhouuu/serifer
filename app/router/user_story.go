@@ -1,7 +1,6 @@
 package router
 
 import (
-	"fmt"
 	"net/http"
 	"sort"
 	"sync"
@@ -65,8 +64,12 @@ func SimilarUserStories(c echo.Context) error {
 
 	var userStories []model.UserStory
 
-	model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
+	if body.TagID >= 0 {
+		model.DB.Where("tag_id = ?", body.TagID).Find(&userStories)
+	} else {
+		model.DB.Find(&userStories)
 
+	}
 	// var ids []uint
 	// var titleVecs, bodyVecs []float64
 	var bodyVecs []float64
@@ -216,7 +219,6 @@ outloop:
 	for i, index := range slice.idx {
 		userStoryExpands[index].Score = Score[i]
 		userStoryResult = append(userStoryResult, &userStoryExpands[index])
-		fmt.Print(userStoryResult)
 		if i >= 4 {
 			break outloop
 		}
